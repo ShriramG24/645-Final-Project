@@ -6,7 +6,7 @@ DATA_PATH = '../data/sdss_100k.csv'
 
 def main():
     data = pd.read_csv(DATA_PATH)
-    print(data.shape)
+    print(data.head()[['rowc', 'colc', 'ra', 'field', 'fieldid', 'dec']])
 
 if __name__ == "__main__":
     main()
