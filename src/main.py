@@ -2,11 +2,15 @@ import numpy as np
 import pandas as pd
 import matplotlib as plt
 
-DATA_PATH = '../data/sdss_100k.csv'
+DATA_PATH = '../data/adult-data.csv'
+COLUMNS = [
+    'age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation', 'relationship',
+    'race', 'sex', 'capital-gain', 'capital-loss', 'hours-per-week', 'native-country', 'class'
+]
 
 def main():
-    data = pd.read_csv(DATA_PATH)
-    print(data.head()[['rowc', 'colc', 'ra', 'field', 'fieldid', 'dec']])
+    data = pd.read_csv(DATA_PATH, names=COLUMNS, index_col=False)
+    print(data.head())
 
 if __name__ == "__main__":
     main()
