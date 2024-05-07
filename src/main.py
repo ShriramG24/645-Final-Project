@@ -14,3 +14,20 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# agg = ['count', 'sum', 'avg', 'min', 'max']
+
+# married = [
+#     'Married-civ-spouse', 
+#     'Married-spouse-absent', 
+#     'Married-AF-spouse'
+# ]
+
+# unmarried = [
+#     'Divorced', 
+#     'Never-married', 
+#     'Separated', 
+#     'Widowed', 
+# ]
+
