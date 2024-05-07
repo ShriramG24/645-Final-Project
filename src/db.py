@@ -13,10 +13,9 @@ conn = psycopg.connect(
 db = conn.cursor()
 
 query = '''
-        SELECT age, AVG(capital_gain)
+        SELECT COUNT(*)
         FROM census
-        where name = bob
-        group by age;
+        WHERE workclass = 'Private';
         '''
 db.execute(query)
 print(db.fetchall())
