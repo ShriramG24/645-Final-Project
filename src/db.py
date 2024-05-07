@@ -11,3 +11,13 @@ conn = psycopg.connect(
 )
 
 db = conn.cursor()
+
+query = '''
+        SELECT age, AVG(capital_gain)
+        FROM census
+        where age > 40
+        group by age;
+        '''
+db.execute(query)
+print(db.fetchall())
+
