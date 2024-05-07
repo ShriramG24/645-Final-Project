@@ -15,7 +15,7 @@ db = conn.cursor()
 query = '''
         SELECT age, AVG(capital_gain)
         FROM census
-        where age > 40
+        where name = bob
         group by age;
         '''
 db.execute(query)
