@@ -56,53 +56,60 @@ class Database:
     # Returns all data in target dataset (in the partition if specified)
     def getTargetData(self, partitionNum = -1):
         if partitionNum >= 0:
-            return self.db.execute(f'''
+            self.db.execute(f'''
                 SELECT * FROM {self.partitions[partitionNum]} WHERE target = 1;
             ''')
-        
-        return self.db.execute(f'''
-            SELECT * FROM {self.table} WHERE marital_status LIKE 'Married%';
-        ''')
+        else:
+            self.db.execute(f'''
+                SELECT * FROM {self.table} WHERE marital_status LIKE 'Married%';
+            ''')
+
+        return self.db.fetchall()
     
     # Returns all data in reference dataset (in the partition if specified)
     def getReferenceData(self, partitionNum = -1):
         if partitionNum >= 0:
-            return self.db.execute(f'''
+            self.db.execute(f'''
                 SELECT * FROM {self.partitions[partitionNum]} WHERE target = 0;
             ''')
+        else:
+            self.db.execute(f'''
+                SELECT * FROM {self.table} WHERE marital_status NOT LIKE 'Married%';
+            ''')
         
-        return self.db.execute(f'''
-            SELECT * FROM {self.table} WHERE marital_status NOT LIKE 'Married%';
-        ''')
+        return self.db.fetchall()
     
     # Returns aggregated view data in target subset of partition
     def getViewTargetData(self, view: View, partitionNum):
         aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
-        return self.db.execute(f'''
+        self.db.execute(f'''
             SELECT {view.groupByAttr},{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             WHERE target = 1
             GROUP BY {view.groupByAttr};
         ''')
+        return self.db.fetchall()
     
     # Returns aggregated view data in reference subset of partition
     def getViewReferenceData(self, view: View, partitionNum):
         aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
-        return self.db.execute(f'''
+        self.db.execute(f'''
             SELECT {view.groupByAttr},{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             WHERE target = 0
             GROUP BY {view.groupByAttr};
         ''')
+        return self.db.fetchall()
     
     # Returns aggregated view data in whole partition
     def getViewCombinedData(self, view: View, partitionNum):
         aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
-        return self.db.execute(f'''
+        self.db.execute(f'''
             SELECT {view.groupByAttr},{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             GROUP BY {view.groupByAttr};
         ''')
+        return self.db.fetchall()
 
     # Closes DB connection and drops all tables and views
     def closeConnection(self):
