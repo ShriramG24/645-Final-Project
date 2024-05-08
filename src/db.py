@@ -3,38 +3,55 @@ from view import View
 
 class Database:
     def __init__(self, dbname: str, tableName) -> None:
-        conn = psycopg.connect(
+        self.conn = psycopg.connect(
             host='localhost',
             dbname=dbname,
             user='postgres'
         )
 
-        self.db = conn.cursor()
+        self.db = self.conn.cursor()
         self.table = tableName
         self.numPartitions = 10
         self.partitions = [f'Partition{i}' for i in range(1, self.numPartitions + 1)]
-        self.setupTables()
 
     # Sets up table and partition views in database
     def setupTables(self):
         with open('setup.sql', 'r') as file:
             self.db.execute(file.read())
 
-        self.db.copy("COPY census FROM '../data/adult-data.csv' WITH CSV;")
+        with open('../data/adult-data.csv', 'r') as data:
+            with self.db.copy('COPY census FROM STDIN WITH (FORMAT CSV);') as copy:
+                while rows := data.read(100):
+                    copy.write(rows)
         
+        self.db.execute(f'''
+            ALTER TABLE census ADD COLUMN id SERIAL PRIMARY KEY;
+
+            CREATE OR REPLACE FUNCTION partition_function(id INT)
+            RETURNS INT AS $$
+            BEGIN
+                RETURN id % 10;
+            END;
+            $$ LANGUAGE plpgsql;
+        ''')
+
         for i, table in enumerate(self.partitions):
             self.db.execute(f'''
                 CREATE VIEW {table} AS
                     SELECT *, CASE WHEN marital_status LIKE 'Married%' THEN 1 ELSE 0 END as target
                     FROM {self.table} WHERE partition_function(id) = {i};
             ''')
+        
+        self.conn.commit()
 
-    # Returns all data
+    # Returns all data (in the partition if specified)
     def getData(self, partitionNum = -1):
         if partitionNum >= 0:
-            return self.db.execute(f"SELECT * FROM {self.partitions[partitionNum]};")
-        
-        return self.db.execute(f"SELECT * FROM {self.table};")
+            self.db.execute(f"SELECT * FROM {self.partitions[partitionNum]};")
+        else:
+            self.db.execute(f"SELECT * FROM {self.table};")
+
+        return self.db.fetchall()
     
     # Returns all data in target dataset (in the partition if specified)
     def getTargetData(self, partitionNum = -1):
@@ -94,4 +111,5 @@ class Database:
                 DROP VIEW IF EXISTS {table};
             ''')
         self.db.execute('DROP TABLE IF EXISTS census;')
+        self.conn.commit()
         self.db.close()
