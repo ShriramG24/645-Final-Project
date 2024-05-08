@@ -1,14 +1,25 @@
-import numpy as np
+from view import View
 
-def kl_divergence(p, q):
-    '''
-    calculate the relative entropy from Q to P
+def generateInitialViews(attrs, measures, aggFuncs):
+    allViews = []
+    for a in attrs:
+        for m in measures:
+            for f in aggFuncs:
+                allViews.append(View(a, [m], [f]))
     
-    https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+    return allViews
 
-    Inputs:
-    - p: 1d numpy array; probability distribution of p
-    - q: 1d numpy array; probability distribution of q
-    '''
+def combineAggregrates(views: list[View]):
+    groupByAttr = views[0].groupByAttr
+    measures, aggFuncs = [], []
+    for view in views:
+        measures.extend([m for m in view.measures if m not in measures])
+        aggFuncs.extend([f for f in view.aggFuncs if f not in aggFuncs])
 
-    return np.sum(p * np.log(p / q, where = (q != 0)))
+    return View(groupByAttr, measures, aggFuncs)
+
+def pruneViews(views):
+    pass
+
+def generateVisualization(view: View):
+    pass
