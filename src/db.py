@@ -52,6 +52,10 @@ class Database:
 
         return self.db.fetchall()
     
+    def getValues(self, attribute):
+        self.db.execute(f"SELECT DISTINCT {attribute} FROM {self.table};")
+        return list(map(lambda t: t[0], self.db.fetchall()))
+    
     # Returns all data in target dataset (in the partition if specified)
     def getTargetData(self, partitionNum = -1):
         if partitionNum >= 0:
