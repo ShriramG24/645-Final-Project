@@ -32,25 +32,30 @@ def rankVisualizations(database: Database, n = 10, k = 5):
             currViews = list(filter(lambda v: v[0] == a, views))
             combinedViews.append(combineAggregrates(currViews))
 
-        for view in combinedViews:
+        for view in combinedViews[:1]:
             a, m, f = view
             data = database.getViewCombinedData(view, partitionNum)
             values = database.getValues(a)
             targetVecs, referenceVecs = splitView(view, values, data)
             for j in range(len(m)):
-                utilitySums[(a, m[j], f[j])] += entropy(targetVecs[j].values(), referenceVecs[j].values())
+                target = np.array(list(targetVecs[j].values()))
+                reference = np.array(list(referenceVecs[j].values()))
+                utilitySums[(a, m[j], f[j])] += entropy(target, reference)
+                # break
 
         # Perform pruning
-        views = pruneViews(utilitySums, views, m, n)
+        print(partitionNum)
+        views = pruneViews(utilitySums, views, partitionNum+1, n, k)
 
-    return heapq.nlargest(k, views, lambda v: utilitySums[v])
+    return heapq.nlargest(k, views, lambda v: utilitySums[v[0], v[1][0], v[2][0]])
+
 
 def main():
     db = Database(DB_NAME, TABLE_NAME)
     db.setupTables()
 
     N, K = 1, 5
-    rankVisualizations(db, N, K)
+    print(rankVisualizations(db, N, K))
 
     db.closeConnection()
 

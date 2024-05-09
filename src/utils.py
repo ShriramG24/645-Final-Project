@@ -1,3 +1,5 @@
+import numpy as np
+
 def splitView(view, values, data):
     _, measures, _ = view
     # m = [m1, m2, ...]
@@ -37,8 +39,33 @@ def combineAggregrates(views: list):
 
     return (groupByAttr, allMeasures, allAggFuncs)
 
-def pruneViews(utilities, views):
-    pass
+def pruneViews(utilities, views, m, n, k):
+    delta = 0.05
+    a = 1 - (m - 1)/n
+    b = 2 * np.log(np.log(m + 0.0001))
+    c = np.log(np.pi ** 2 / (3 * delta))
+    # print(a, b, c)
+    epsilon = np.sqrt((a * b + c) / (2 * m))
 
+    # considerd views upper bound
+    upperBound = { (view[0], view[1][0], view[2][0]) : utilities[view[0], view[1][0], view[2][0]]/m + epsilon for view in views }
+
+    # list of tuples sorted by upper bound in ascending order
+    sortedd = sorted(upperBound.items(), key=lambda view: view[1])
+
+    if len(sortedd) >= k:
+        topKViews = sortedd[-k:]
+
+    # get lower bound of the top k views
+    lowestTopKUtil = sortedd[0][1] - 2 * epsilon
+
+    for v in utilities.keys():
+        if v not in dict(topKViews).keys():
+            # if view.upperbound < lowestLowerbound, remove
+            if utilities[v]/m + epsilon < lowestTopKUtil:
+                views.remove(v)
+    
+    return views
+        
 def generateVisualization(view):
     pass
