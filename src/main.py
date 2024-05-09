@@ -1,6 +1,5 @@
 import numpy as np
-import matplotlib as plt
-import heapq
+import heapq, os
 from utils import *
 from db import Database
 from scipy.stats import entropy
@@ -51,6 +50,8 @@ def rankVisualizations(database: Database, n = 10, k = 5):
 
 
 def main():
+    if not os.path.exists('../visualizations/'):
+        os.mkdir('../visualizations/')
     db = Database(DB_NAME, TABLE_NAME)
     db.setupTables()
 

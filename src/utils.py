@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 def splitView(view, values, data):
@@ -67,5 +68,16 @@ def pruneViews(utilities, views, m, n, k):
     
     return views
         
-def generateVisualization(view):
-    pass
+def generateVisualization(view, targetData, referenceData, figName):
+    a, [m], [f] = view
+    X, targetY = [t[0] for t in targetData], [t[1] for t in targetData]
+    referenceY = [r[1] for r in referenceData]
+
+    _X = np.arange(len(X))
+    plt.bar(_X - 0.2, targetY, width=0.4)
+    plt.bar(_X + 0.2, referenceY, width=0.4)
+    plt.xticks(_X, X)
+    plt.title(f'{a.capitalize()} vs {f}({m.capitalize()})')
+    plt.xlabel(a.capitalize())
+    plt.ylabel(f'{f}({m.capitalize()})')
+    plt.savefig(f'../visualizations/{figName}.png')
