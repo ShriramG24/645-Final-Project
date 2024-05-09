@@ -104,7 +104,7 @@ class Database:
     def getViewCombinedData(self, view, partitionNum):
         aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
-            SELECT {view[0]},{','.join(aggCalls)},target
+            SELECT {view[0]},target,{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             GROUP BY {view[0]},target;
         ''')
