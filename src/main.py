@@ -24,7 +24,7 @@ AGGREGATES = [ 'AVG', 'SUM', 'COUNT', 'MIN', 'MAX' ]
 # k: Top k visualizations will be returned
 def rankVisualizations(database: Database, n = 10, k = 5):
     views = generateInitialViews(ATTRIBUTES, MEASURES, AGGREGATES)
-    utilities = { (a, m, f): 0 for a, [m], [f] in views }
+    utilitySums = { (a, m, f): 0 for a, [m], [f] in views }
     for i in range(n):
         partitionNum = i
         combinedViews = []
@@ -38,12 +38,12 @@ def rankVisualizations(database: Database, n = 10, k = 5):
             values = database.getValues(a)
             targetVecs, referenceVecs = splitView(view, values, data)
             for j in range(len(m)):
-                utilities[(a, m[j], f[j])] += entropy(targetVecs[j].values(), referenceVecs[j].values())
+                utilitySums[(a, m[j], f[j])] += entropy(targetVecs[j].values(), referenceVecs[j].values())
 
         # Perform pruning
-        views = pruneViews(utilities, combinedViews)
+        views = pruneViews(utilitySums, views, m, n)
 
-    return heapq.nlargest(k, views, lambda v: utilities[v])
+    return heapq.nlargest(k, views, lambda v: utilitySums[v])
 
 def main():
     db = Database(DB_NAME, TABLE_NAME)
