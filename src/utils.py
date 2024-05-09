@@ -40,34 +40,26 @@ def combineAggregrates(views: list):
 
     return (groupByAttr, allMeasures, allAggFuncs)
 
-def pruneViews(utilities, views, m, n, k):
-    delta = 0.05
-    a = 1 - (m - 1)/n
-    b = 2 * np.log(np.log(m + 0.0001))
+def confidenceInterval(m, n, delta=0.05):
+    a = 1 - (m - 1) / n
+    b = 2 * np.log(np.log(m + 1e-5))
     c = np.log(np.pi ** 2 / (3 * delta))
-    # print(a, b, c)
-    epsilon = np.sqrt((a * b + c) / (2 * m))
-
-    # considerd views upper bound
-    upperBound = { (view[0], view[1][0], view[2][0]) : utilities[view[0], view[1][0], view[2][0]]/m + epsilon for view in views }
-
-    # list of tuples sorted by upper bound in ascending order
-    sortedd = sorted(upperBound.items(), key=lambda view: view[1])
-
-    if len(sortedd) >= k:
-        topKViews = sortedd[-k:]
-
-    # get lower bound of the top k views
-    lowestTopKUtil = sortedd[0][1] - 2 * epsilon
-
-    for v in utilities.keys():
-        if v not in dict(topKViews).keys():
-            # if view.upperbound < lowestLowerbound, remove
-            if utilities[v]/m + epsilon < lowestTopKUtil:
-                views.remove(v)
     
-    return views
-        
+    return np.sqrt((a * b + c) / (2 * m))
+
+def pruneViews(utilities, views, m, n, k):
+    epsilon = confidenceInterval(m, n)
+
+    upperBounds = [utilities[(v[0], v[1][0], v[2][0])] / m + epsilon for view in views]
+    topKLowerBound = list(sorted(upperBounds, reverse=True))[k - 1] - 2 * epsilon
+
+    result = []
+    for v, u in utilities.items():
+        if (u / m + epsilon) >= topKLowerBound:
+            result.append(v)
+    
+    return result
+
 def generateVisualization(view, targetData, referenceData, figName):
     a, [m], [f] = view
     X, targetY = [t[0] for t in targetData], [t[1] for t in targetData]
