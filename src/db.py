@@ -83,33 +83,33 @@ class Database:
         return self.db.fetchall()
     
     # Returns aggregated view data in target subset of partition
-    def getViewTargetData(self, view, partitionNum):
+    def getViewTargetData(self, view, partitionNum = -1):
         aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
             SELECT {view[0]},{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum]}
+            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
             WHERE target = 1
             GROUP BY {view[0]};
         ''')
         return self.db.fetchall()
     
     # Returns aggregated view data in reference subset of partition
-    def getViewReferenceData(self, view, partitionNum):
+    def getViewReferenceData(self, view, partitionNum = -1):
         aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
             SELECT {view[0]},{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum]}
+            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
             WHERE target = 0
             GROUP BY {view[0]};
         ''')
         return self.db.fetchall()
     
     # Returns aggregated view data in whole partition
-    def getViewCombinedData(self, view, partitionNum):
+    def getViewCombinedData(self, view, partitionNum = -1):
         aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
             SELECT {view[0]},target,{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum]}
+            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
             GROUP BY {view[0]},target;
         ''')
         return self.db.fetchall()
