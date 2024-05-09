@@ -37,7 +37,7 @@ def combineAggregrates(views: list):
 
     return (groupByAttr, allMeasures, allAggFuncs)
 
-def pruneViews(views):
+def pruneViews(utilities, views):
     pass
 
 def generateVisualization(view):

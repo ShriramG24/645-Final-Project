@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as plt
+import heapq
 from utils import *
 from db import Database
 from scipy.stats import entropy
@@ -31,16 +32,18 @@ def rankVisualizations(database: Database, n = 10, k = 5):
             currViews = list(filter(lambda v: v[0] == a, views))
             combinedViews.append(combineAggregrates(currViews))
 
-        for view in combinedViews[:1]:
+        for view in combinedViews:
             a, m, f = view
             data = database.getViewCombinedData(view, partitionNum)
             values = database.getValues(a)
             targetVecs, referenceVecs = splitView(view, values, data)
-            for i in range(len(m)):
-                utilities[(a, m[i], f[i])] += entropy(targetVecs[i].values(), referenceVecs[i].values())
+            for j in range(len(m)):
+                utilities[(a, m[j], f[j])] += entropy(targetVecs[j].values(), referenceVecs[j].values())
 
         # Perform pruning
-        views = pruneViews(combinedViews)
+        views = pruneViews(utilities, combinedViews)
+
+    return heapq.nlargest(k, views, lambda v: utilities[v])
 
 def main():
     db = Database(DB_NAME, TABLE_NAME)
