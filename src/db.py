@@ -82,35 +82,38 @@ class Database:
         
         return self.db.fetchall()
     
-    # Returns aggregated view data in target subset of partition
-    def getViewTargetData(self, view, partitionNum = -1):
-        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
+    # Returns aggregated view in target data
+    def getViewTargetData(self, view):
+        a, m, f = view
+        aggCalls = [f'{f[i]}({m[i]})' for i in range(len(m))]
         self.db.execute(f'''
-            SELECT {view[0]},{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
-            WHERE target = 1
-            GROUP BY {view[0]};
+            SELECT {a},{','.join(aggCalls)}
+            FROM {self.table}
+            WHERE marital_status LIKE 'Married%'
+            GROUP BY {a};
         ''')
         return self.db.fetchall()
     
-    # Returns aggregated view data in reference subset of partition
-    def getViewReferenceData(self, view, partitionNum = -1):
-        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
+    # Returns aggregated view in reference data
+    def getViewReferenceData(self, view):
+        a, m, f = view
+        aggCalls = [f'{f[i]}({m[i]})' for i in range(len(m))]
         self.db.execute(f'''
-            SELECT {view[0]},{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
-            WHERE target = 0
-            GROUP BY {view[0]};
+            SELECT {a},{','.join(aggCalls)}
+            FROM {self.table}
+            WHERE marital_status NOT LIKE 'Married%'
+            GROUP BY {a};
         ''')
         return self.db.fetchall()
     
     # Returns aggregated view data in whole partition
-    def getViewCombinedData(self, view, partitionNum = -1):
-        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
+    def getViewCombinedData(self, view, partitionNum = 0):
+        a, m, f = view
+        aggCalls = [f'{f[i]}({m[i]})' for i in range(len(m))]
         self.db.execute(f'''
-            SELECT {view[0]},target,{','.join(aggCalls)}
-            FROM {self.partitions[partitionNum] if partitionNum >= 0 else self.table}
-            GROUP BY {view[0]},target;
+            SELECT {a},target,{','.join(aggCalls)}
+            FROM {self.partitions[partitionNum]}
+            GROUP BY {a},target;
         ''')
         return self.db.fetchall()
 
