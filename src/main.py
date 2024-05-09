@@ -21,10 +21,10 @@ AGGREGATES = [ 'AVG', 'SUM', 'COUNT', 'MIN', 'MAX' ]
 
 # n: Number of phases
 # k: Top k visualizations will be returned
-def rankVisualizations(database: Database, n = 10, k = 5):
+def topKVisualizations(database: Database, N = 10, K = 5):
     views = generateInitialViews(ATTRIBUTES, MEASURES, AGGREGATES)
     utilitySums = { (a, m, f): 0 for a, [m], [f] in views }
-    for i in range(n):
+    for i in range(N):
         partitionNum = i
         combinedViews = []
         for a in ATTRIBUTES:
@@ -42,20 +42,25 @@ def rankVisualizations(database: Database, n = 10, k = 5):
                 utilitySums[(a, m[j], f[j])] += entropy(target, reference)
 
         if i > 0:
-            views = pruneViews(utilitySums, views, partitionNum + 1, n, k)
+            views = pruneViews(utilitySums, views, partitionNum + 1, N, K)
 
-    return heapq.nlargest(k, views, lambda v: utilitySums[v[0], v[1][0], v[2][0]])
+    return heapq.nlargest(K, views, lambda v: utilitySums[(v[0], v[1][0], v[2][0])])
 
 def main():
     if not os.path.exists('../visualizations/'):
         os.mkdir('../visualizations/')
-    db = Database(DB_NAME, TABLE_NAME)
-    db.setupTables()
+    database = Database(DB_NAME, TABLE_NAME)
+    database.setupTables()
 
     N, K = 1, 5
-    print(rankVisualizations(db, N, K))
+    results = topKVisualizations(database, N, K)
+    for k, view in enumerate(results):
+        values = database.getValues(view[0])
+        targetData = formatData(values, database.getViewTargetData(view))
+        referenceData = formatData(values, database.getViewReferenceData(view))
+        generateVisualization(view, targetData, referenceData, f'Top-{k + 1}-Visualization')
 
-    db.closeConnection()
+    database.closeConnection()
 
 if __name__ == "__main__":
     main()
