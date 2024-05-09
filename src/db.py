@@ -1,5 +1,4 @@
 import psycopg
-from view import View
 
 class Database:
     def __init__(self, dbname: str, tableName) -> None:
@@ -12,7 +11,7 @@ class Database:
         self.db = self.conn.cursor()
         self.table = tableName
         self.numPartitions = 10
-        self.partitions = [f'Partition{i}' for i in range(1, self.numPartitions + 1)]
+        self.partitions = [f'Partition{i}' for i in range(self.numPartitions)]
 
     # Sets up table and partition views in database
     def setupTables(self):
@@ -80,34 +79,34 @@ class Database:
         return self.db.fetchall()
     
     # Returns aggregated view data in target subset of partition
-    def getViewTargetData(self, view: View, partitionNum):
-        aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
+    def getViewTargetData(self, view, partitionNum):
+        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
-            SELECT {view.groupByAttr},{','.join(aggCalls)}
+            SELECT {view[0]},{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             WHERE target = 1
-            GROUP BY {view.groupByAttr};
+            GROUP BY {view[0]};
         ''')
         return self.db.fetchall()
     
     # Returns aggregated view data in reference subset of partition
-    def getViewReferenceData(self, view: View, partitionNum):
-        aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
+    def getViewReferenceData(self, view, partitionNum):
+        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
-            SELECT {view.groupByAttr},{','.join(aggCalls)}
+            SELECT {view[0]},{','.join(aggCalls)}
             FROM {self.partitions[partitionNum]}
             WHERE target = 0
-            GROUP BY {view.groupByAttr};
+            GROUP BY {view[0]};
         ''')
         return self.db.fetchall()
     
     # Returns aggregated view data in whole partition
-    def getViewCombinedData(self, view: View, partitionNum):
-        aggCalls = [f'{view.aggFuncs[i]}({view.measures[i]})' for i in range(len(view.measures))]
+    def getViewCombinedData(self, view, partitionNum):
+        aggCalls = [f'{view[2][i]}({view[1][i]})' for i in range(len(view[1]))]
         self.db.execute(f'''
-            SELECT {view.groupByAttr},{','.join(aggCalls)}
+            SELECT {view[0]},{','.join(aggCalls)},target
             FROM {self.partitions[partitionNum]}
-            GROUP BY {view.groupByAttr};
+            GROUP BY {view[0]},target;
         ''')
         return self.db.fetchall()
 
