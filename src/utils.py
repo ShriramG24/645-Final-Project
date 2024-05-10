@@ -37,8 +37,8 @@ def combineAggregrates(views: list):
     allMeasures, allAggFuncs = [], []
     for view in views:
         groupByAttr, measures, aggFuncs = view
-        allMeasures.extend([m for m in measures])
-        allAggFuncs.extend([f for f in aggFuncs])
+        allMeasures.extend(measures)
+        allAggFuncs.extend(aggFuncs)
 
     return (groupByAttr, allMeasures, allAggFuncs)
 
