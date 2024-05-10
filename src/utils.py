@@ -75,5 +75,6 @@ def generateVisualization(view, targetData, referenceData, figName):
     plt.title(f'{a.capitalize()} vs {f}({m.capitalize()})')
     plt.xlabel(a.capitalize())
     plt.ylabel(f'{f}({m.capitalize()})')
+    plt.legend(['Target (Married)', 'Reference (Unmarried)'])
     plt.savefig(f'../visualizations/{figName}.png')
     plt.clf()
