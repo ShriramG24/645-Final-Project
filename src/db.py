@@ -29,7 +29,7 @@ class Database:
             CREATE OR REPLACE FUNCTION partition_function(id INT)
             RETURNS INT AS $$
             BEGIN
-                RETURN id % 10;
+                RETURN id % {self.numPartitions};
             END;
             $$ LANGUAGE plpgsql;
         ''')
