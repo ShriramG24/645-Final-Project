@@ -39,6 +39,8 @@ def topKVisualizations(database: Database, N = 10, K = 5):
 
             for j in range(len(m)):
                 utilitySums[(a, m[j], f[j])] += normalized[j]
+                
+                # utilitySums[(a, m[j], f[j])] += entropy(target, reference)
                 # utilitySums[(a, m[j], f[j])] += np.sqrt(np.linalg.norm(target - reference, ord=2))
                 # utilitySums[(a, m[j], f[j])] += wasserstein_distance(target, reference)
 
