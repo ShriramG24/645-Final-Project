@@ -56,32 +56,6 @@ class Database:
         self.db.execute(f"SELECT DISTINCT {attribute} FROM {self.table};")
         return list(map(lambda t: t[0], self.db.fetchall()))
     
-    # Returns all data in target dataset (in the partition if specified)
-    def getTargetData(self, partitionNum = -1):
-        if partitionNum >= 0:
-            self.db.execute(f'''
-                SELECT * FROM {self.partitions[partitionNum]} WHERE target = 1;
-            ''')
-        else:
-            self.db.execute(f'''
-                SELECT * FROM {self.table} WHERE marital_status LIKE 'Married%';
-            ''')
-
-        return self.db.fetchall()
-    
-    # Returns all data in reference dataset (in the partition if specified)
-    def getReferenceData(self, partitionNum = -1):
-        if partitionNum >= 0:
-            self.db.execute(f'''
-                SELECT * FROM {self.partitions[partitionNum]} WHERE target = 0;
-            ''')
-        else:
-            self.db.execute(f'''
-                SELECT * FROM {self.table} WHERE marital_status NOT LIKE 'Married%';
-            ''')
-        
-        return self.db.fetchall()
-    
     # Returns aggregated view in target data
     def getViewTargetData(self, view):
         a, m, f = view
