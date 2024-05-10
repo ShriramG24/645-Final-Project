@@ -68,10 +68,13 @@ def generateVisualization(view, targetData, referenceData, figName):
     referenceY = [r[1] for r in referenceData.items()]
 
     _X = np.arange(len(X))
-    plt.figure(figsize=(8.0, 5.0))
+    plt.figure(figsize=(8.0, 6.0))
     plt.bar(_X - 0.2, targetY, width=0.4)
     plt.bar(_X + 0.2, referenceY, width=0.4)
-    plt.xticks(_X, X)
+    if a in {'occupation', 'native_country'}:
+        plt.xticks(_X, X, rotation=90)
+    else:
+        plt.xticks(_X, X)
     plt.title(f'{a.capitalize()} vs {f}({m.capitalize()})')
     plt.xlabel(a.capitalize())
     plt.ylabel(f'{f}({m.capitalize()})')
