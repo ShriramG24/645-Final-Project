@@ -53,12 +53,12 @@ def pruneViews(utilitySums, views, M, N, K):
     epsilon = confidenceInterval(M, N)
 
     upperBounds = [utilitySums[(v[0], v[1][0], v[2][0])] / M + epsilon for v in views]
-    topKLowerBound = list(sorted(upperBounds, reverse=True))[K - 1] - 2 * epsilon
+    topKLowerBound = sorted(upperBounds, reverse=True)[:K - 1][-1] - 2 * epsilon
 
     result = []
     for v, u in utilitySums.items():
         if (u / M + epsilon) >= topKLowerBound:
-            result.append(v)
+            result.append((v[0], [v[1]], [v[2]]))
     
     return result
 

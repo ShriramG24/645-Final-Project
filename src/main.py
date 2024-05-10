@@ -25,15 +25,16 @@ def topKVisualizations(database: Database, N = 10, K = 5):
     views = generateInitialViews(ATTRIBUTES, MEASURES, AGGREGATES)
     utilitySums = { (a, m, f): 0 for a, [m], [f] in views }
     for i in range(N):
-        partitionNum = i
         combinedViews = []
         for a in ATTRIBUTES:
             currViews = list(filter(lambda v: v[0] == a, views))
-            combinedViews.append(combineAggregrates(currViews))
+
+            if currViews:
+                combinedViews.append(combineAggregrates(currViews))
 
         for view in combinedViews:
             a, m, f = view
-            data = database.getViewCombinedData(view, partitionNum)
+            data = database.getViewCombinedData(view, i)
             values = database.getValues(a)
             targetVecs, referenceVecs = splitView(view, values, data)
             for j in range(len(m)):
@@ -42,7 +43,7 @@ def topKVisualizations(database: Database, N = 10, K = 5):
                 utilitySums[(a, m[j], f[j])] += entropy(target, reference)
 
         if i > 0:
-            views = pruneViews(utilitySums, views, partitionNum + 1, N, K)
+            views = pruneViews(utilitySums, views, i+1, N, K)
 
     return heapq.nlargest(K, views, lambda v: utilitySums[(v[0], v[1][0], v[2][0])])
 
@@ -52,7 +53,7 @@ def main():
     database = Database(DB_NAME, TABLE_NAME)
     database.setupTables()
 
-    N, K = 1, 5
+    N, K = 10, 5
     results = topKVisualizations(database, N, K)
     for k, view in enumerate(results):
         values = database.getValues(view[0])
