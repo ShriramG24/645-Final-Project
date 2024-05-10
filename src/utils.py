@@ -71,7 +71,7 @@ def generateVisualization(view, targetData, referenceData, figName):
     plt.figure(figsize=(8.0, 6.0))
     plt.bar(_X - 0.2, targetY, width=0.4)
     plt.bar(_X + 0.2, referenceY, width=0.4)
-    if a in {'occupation', 'native_country'}:
+    if a in {'occupation', 'native_country', 'education'}:
         plt.xticks(_X, X, rotation=90)
     else:
         plt.xticks(_X, X)
