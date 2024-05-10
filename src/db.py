@@ -1,7 +1,7 @@
 import psycopg
 
 class Database:
-    def __init__(self, dbname: str, tableName) -> None:
+    def __init__(self, dbname: str, tableName, numPartitions: int) -> None:
         self.conn = psycopg.connect(
             host='localhost',
             dbname=dbname,
@@ -10,7 +10,7 @@ class Database:
 
         self.db = self.conn.cursor()
         self.table = tableName
-        self.numPartitions = 10
+        self.numPartitions = numPartitions
         self.partitions = [f'Partition{i}' for i in range(self.numPartitions)]
 
     # Sets up table and partition views in database

@@ -1,13 +1,12 @@
-DROP VIEW IF EXISTS partition0;
-DROP VIEW IF EXISTS partition1;
-DROP VIEW IF EXISTS partition2;
-DROP VIEW IF EXISTS partition3;
-DROP VIEW IF EXISTS partition4;
-DROP VIEW IF EXISTS partition5;
-DROP VIEW IF EXISTS partition6;
-DROP VIEW IF EXISTS partition7;
-DROP VIEW IF EXISTS partition8;
-DROP VIEW IF EXISTS partition9;
+DO $$
+DECLARE
+    i INTEGER := 1;
+BEGIN
+    WHILE i <= 50 LOOP
+        EXECUTE format('DROP VIEW IF EXISTS partition%s', i);
+        i := i + 1;
+    END LOOP;
+END $$;
 DROP TABLE IF EXISTS census;
 
 CREATE TABLE census (

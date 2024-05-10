@@ -47,12 +47,12 @@ def topKVisualizations(database: Database, N = 10, K = 5):
     return heapq.nlargest(K, views, lambda v: utilitySums[(v[0], v[1][0], v[2][0])])
 
 def main():
+    N, K = 10, 5
     if not os.path.exists('../visualizations/'):
         os.mkdir('../visualizations/')
-    database = Database(DB_NAME, TABLE_NAME)
+    database = Database(DB_NAME, TABLE_NAME, min(N, 50))
     database.setupTables()
 
-    N, K = 10, 5
     results = topKVisualizations(database, N, K)
     for k, view in enumerate(results):
         values = database.getValues(view[0])
