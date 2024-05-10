@@ -30,10 +30,17 @@ def topKVisualizations(database: Database, N = 10, K = 5):
             data = database.getViewCombinedData(view, i)
             values = database.getValues(a)
             targetVecs, referenceVecs = splitView(view, values, data)
+
+            l = []
             for j in range(len(m)):
                 target = np.array(list(targetVecs[j].values()))
                 reference = np.array(list(referenceVecs[j].values()))
-                utilitySums[(a, m[j], f[j])] += entropy(target, reference)
+                l.append(entropy(target, reference))
+            l = np.array(l)
+            normalized = list(l-np.min(l))/(np.max(l)-np.min(l))
+
+            for j in range(len(m)):
+                utilitySums[(a, m[j], f[j])] += normalized[j]
 
         if i > 0:
             views = pruneViews(utilitySums, views, i + 1, N, K)
