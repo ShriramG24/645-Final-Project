@@ -28,7 +28,6 @@ def topKVisualizations(database: Database, N = 10, K = 5):
         combinedViews = []
         for a in ATTRIBUTES:
             currViews = list(filter(lambda v: v[0] == a, views))
-
             if currViews:
                 combinedViews.append(combineAggregrates(currViews))
 
@@ -43,7 +42,7 @@ def topKVisualizations(database: Database, N = 10, K = 5):
                 utilitySums[(a, m[j], f[j])] += entropy(target, reference)
 
         if i > 0:
-            views = pruneViews(utilitySums, views, i+1, N, K)
+            views = pruneViews(utilitySums, views, i + 1, N, K)
 
     return heapq.nlargest(K, views, lambda v: utilitySums[(v[0], v[1][0], v[2][0])])
 
