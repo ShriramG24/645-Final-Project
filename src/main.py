@@ -63,7 +63,7 @@ def main():
             values = database.getValues(view[0])
             targetData = formatData(values, database.getViewTargetData(view))
             referenceData = formatData(values, database.getViewReferenceData(view))
-            generateVisualization(view, targetData, referenceData, f'Top-{k + 1}-{utility.__name__}.png')
+            generateVisualization(view, targetData, referenceData, f'Top-{k + 1}-{utility.__name__}')
 
     database.closeConnection()
 
