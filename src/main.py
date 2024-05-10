@@ -4,12 +4,6 @@ from utils import *
 from db import Database
 from scipy.stats import entropy
 
-DATA_PATH = '../data/adult_data.csv'
-COLUMNS = [
-    'age', 'workclass', 'fnlwgt', 'education', 'education_num', 'marital_status', 'occupation', 'relationship',
-    'race', 'sex', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'class'
-]
-
 DB_NAME = 'project3'
 TABLE_NAME = 'census'
 
