@@ -157,8 +157,9 @@ def generateVisualization(view, targetData, referenceData, figName):
     plt.figure(figsize=(8.0, 6.0))
     plt.bar(_X - 0.2, targetY, width=0.4)
     plt.bar(_X + 0.2, referenceY, width=0.4)
-    if a in {'occupation', 'native_country', 'education'}:
-        plt.xticks(_X, X, rotation=90)
+    if a in {'occupation', 'native_country', 'education', 'workclass'}:
+        plt.xticks(_X, X, rotation=60)
+        plt.subplots_adjust(bottom=0.25)
     else:
         plt.xticks(_X, X)
     plt.title(f'{a.capitalize()} vs {f}({m.capitalize()})')
