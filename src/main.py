@@ -2,7 +2,7 @@ import numpy as np
 import heapq, os
 from utils import *
 from db import Database
-from scipy.stats import entropy
+from scipy.stats import entropy, wasserstein_distance
 
 DB_NAME = 'project3'
 TABLE_NAME = 'census'
@@ -10,11 +10,9 @@ TABLE_NAME = 'census'
 ATTRIBUTES = [
     'workclass', 'education', 'occupation', 'relationship', 'race', 'sex', 'native_country', 'class'
 ]
-MEASURES = [ 'age', 'fnlwgt', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week' ]
+MEASURES = [ 'age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week' ]
 AGGREGATES = [ 'AVG', 'SUM', 'COUNT', 'MIN', 'MAX' ]
 
-# n: Number of phases
-# k: Top k visualizations will be returned
 def topKVisualizations(database: Database, N = 10, K = 5):
     views = generateInitialViews(ATTRIBUTES, MEASURES, AGGREGATES)
     utilitySums = { (a, m, f): 0 for a, [m], [f] in views }
@@ -41,6 +39,8 @@ def topKVisualizations(database: Database, N = 10, K = 5):
 
             for j in range(len(m)):
                 utilitySums[(a, m[j], f[j])] += normalized[j]
+                # utilitySums[(a, m[j], f[j])] += np.sqrt(np.linalg.norm(target - reference, ord=2))
+                # utilitySums[(a, m[j], f[j])] += wasserstein_distance(target, reference)
 
         if i > 0:
             views = pruneViews(utilitySums, views, i + 1, N, K)
