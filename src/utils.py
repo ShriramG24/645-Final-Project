@@ -91,7 +91,7 @@ def combineAggregrates(views: list):
 
 def confidenceInterval(M, N, delta=0.05):
     '''
-    Computes the confidence interval for the given parameters.
+    Computes the confidence interval for the given parameters using Hoeffding-Serfling Inequality
 
     Inputs:
     - M: number of iterations
@@ -106,7 +106,7 @@ def confidenceInterval(M, N, delta=0.05):
     b = 2 * np.log(np.log(M + 1e-5))
     c = np.log(np.pi ** 2 / (3 * delta))
     
-    return np.sqrt((a * b + c) / (2 * M))
+    return np.sqrt((a * (b + c)) / (2 * M))
 
 def pruneViews(utilitySums, views, M, N, K):
     '''
